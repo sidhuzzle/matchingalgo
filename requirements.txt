@@ -1,0 +1,8 @@
+streamlit
+ez_setup
+setuptools
+config
+psycopg2-binary
+sentence_transformers
+scipy
+click==8
