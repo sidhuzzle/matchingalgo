@@ -37,7 +37,7 @@ goal_dataframe_mapping = {
     'Expand my Network & Connect with Industry Leaders':goal_8,
     'No goals selected' : goal_9} 
 
-goals = ['Start my Career with a Spring Week','Get a Summer Internship','Get an Internship alongside my Studies', 'Land a Placement Year','Win Awards & Competitions','Secure a Graduate Job','Find a Co-founder & Start a Business', 'Meet like-minded students','Expand my Network & Meet Industry Leader']
+goals = ['Start my Career with a Spring Week','Get a Summer Internship','Get an Internship alongside my Studies', 'Land a Placement Year','Win Awards & Competitions','Secure a Graduate Job','Find a Co-founder & Start a Business', 'Meet Like-minded Students & join Societies','Expand my Network & Meet Industry Leader']
 Goals =  st.multiselect('Enter the goals',goals,key = "one")
 
 interest = st.multiselect('Enter the interest',df_tags['name'].unique(),key = "two")
