@@ -5,7 +5,7 @@ import collections, functools, operator
 from sentence_transformers import SentenceTransformer
 import numpy as np
 from scipy.spatial import distance
-
+@st.cache(ttl=24*3600)
 engine = pg.connect("dbname='huzzle_staging' user='postgres' host='huzzle-staging.ct4mk1ahmp9p.eu-central-1.rds.amazonaws.com' port='5432' password='2Yw*PG9x-FcWvc7R'")
 df_tags = pd.read_sql('select * from tags', con=engine)
 df_degrees = pd.read_sql('select * from degrees', con=engine)
@@ -129,16 +129,6 @@ for x in Goals:
    df_T['description'] = df_T['description'].str.replace(r'[^\w\s]+', '', regex=True)
    df_T['description'] = df_T['description'].str.lower()
    df_T['Interest'] = df_T['Interest'].str.lower()
-   model = SentenceTransformer('bert-base-nli-mean-tokens')
-   sentence_embeddings = model.encode(df_T['description'])
-   word_embeddings = model.encode(df_T['Interest'])
-   A = np.arange(len(df_T['description']))
-   for a in A:
-      description_score  =  distance.cdist([sentence_embeddings[a]],word_embeddings[0:])
-      a += 1
-      for x in description_score:
-            df_T['description_score']=pd.Series(x)
-     
    df_T['city score'] = np.nan
    df_universities = pd.merge(df_universities, df_cities, left_on='city_id',right_on='id',suffixes=('', '_x'),how = 'inner')
    df_universities = df_universities.loc[:,~df_universities.columns.duplicated()]
