@@ -121,12 +121,16 @@ df = pd.merge(df,df_cities,left_on='city_id',right_on='id',suffixes=('', '_x'),h
 df = df.loc[:,~df.columns.duplicated()]
 df =  pd.merge(df, df_goals, left_on='kind',right_on='kind_1',suffixes=('', '_x'),how = 'inner')
 df = df.loc[:,~df.columns.duplicated()]
-
-     
-     #grouped_5 = df.groupby(df.type)
-     #df_T = grouped_5.get_group("Topic")
 df_T =  pd.merge(df, df_interest, left_on='name',right_on='Interest',suffixes=('', '_x'),how = 'inner')
 df_T = df_T.loc[:,~df_T.columns.duplicated()]
+df_T['idx'] = df_T.groupby(['touchpointable_id', 'name']).cumcount()
+df_T = df_T.pivot(index=['idx','touchpointable_id'], columns='name', values='Weight').sort_index(level=1).reset_index().rename_axis(None, axis=1)
+df_T.fillna(0)
+col_list = interest
+df_T['Sum'] = df_T[col_list].sum(axis=1)
+df_T = pd.merge(df, df_T, left_on='touchpointable_id',right_on='touchpointable_id',suffixes=('', '_x'),how = 'inner')
+df_T = df_T.loc[:,~df_T.columns.duplicated()]
+df_T = df_T.groupby('touchpointable_id', as_index=False).first()
 df_T['description'] = df_T['description'].str.replace(r'<[^<>]*>', '', regex=True)
 df_T['description'] = df_T['description'].str.replace(r'[^\w\s]+', '', regex=True)
 df_T['description'] = df_T['description'].str.lower()
