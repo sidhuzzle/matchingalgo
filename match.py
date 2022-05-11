@@ -127,7 +127,7 @@ df_T = df_T.loc[:,~df_T.columns.duplicated()]
 df_T['idx'] = df_T.groupby(['touchpointable_id', 'name']).cumcount()
 df_T = df_T.pivot(index=['idx','touchpointable_id'], columns='name', values='Weight').sort_index(level=1).reset_index().rename_axis(None, axis=1)
 df_T.fillna(0)
-col_list = [interest]
+col_list = df_interest["Interest"].values.tolist()
 df_T['Sum'] = df_T[col_list].sum(axis=1)
 df_T = pd.merge(df, df_T, left_on='touchpointable_id',right_on='touchpointable_id',suffixes=('', '_x'),how = 'inner')
 df_T = df_T.loc[:,~df_T.columns.duplicated()]
