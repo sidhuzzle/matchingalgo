@@ -14,6 +14,7 @@ df_degrees['name'] = df_degrees['name'].replace(["Master's"],['Masters'])
 df_universities = pd.read_sql('select * from universities', con=engine)
 df_subjects = pd.read_sql('select * from subjects', con=engine)
 df_subjects.rename(columns = {'name':'subject_name'}, inplace = True)
+df_subjects['subject_name'] = df_subjects['subject_name'].replace(['Information Technology'],['IT'])
 goal_0 = [{'Spring Weeks':7, 'Virtual Internship':3, 'Career Fairs':3,'Insight Days':5,'Competitions':2}]                                      #Initialing touchpoint weights,later on this will be converted to dataframe
 goal_1 = [{'Summer Internship':10, 'Networking & Social':3,'Career Fairs':3,'Insight Days':2,'Workshops':2}]
 goal_2 = [{'Virtual Internship':3, 'Off-cycle':7, 'Networking & Social':5,'Career Fairs':2,'Conferences & Talks':3}]
@@ -41,7 +42,7 @@ goals = ['Start my Career with a Spring Week','Get a Summer Internship','Get an 
 Goals =  st.multiselect('Enter the goals',goals,key = "one")
 
 interest = st.multiselect('Enter the interest',df_tags['name'].unique(),key = "two")
-weight = [1,2,3,3,2,1,1,2,3,3,2,1,1,2,3,3,2,1,1,2,3,3,2,1,1,2,3,3,2,1,1,2,3,3,2,1,1,2,3,3,2,1,1,2,3,3,2,1,1,2,3,3,2,1,1,2,3,3,2,1,1,2,3,3,2,1,3,3,2,1,1,2,3,3,2]
+weight = [1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,1,2,1]
 Weight = st.multiselect('Enter the weight',weight,key = "three")
 Interest = pd.DataFrame(interest,columns = ['Interest'])
 Weight = pd.DataFrame(Weight,columns = ['Weight'])
@@ -130,11 +131,6 @@ col_list = interest
 df_T['Sum'] = df_T[col_list].sum(axis=1)
 df_T = pd.merge(df, df_T, left_on='touchpointable_id',right_on='touchpointable_id',suffixes=('', '_x'),how = 'inner')
 df_T = df_T.loc[:,~df_T.columns.duplicated()]
-df_T = df_T.groupby('touchpointable_id', as_index=False).first()
-df_T['description'] = df_T['description'].str.replace(r'<[^<>]*>', '', regex=True)
-df_T['description'] = df_T['description'].str.replace(r'[^\w\s]+', '', regex=True)
-df_T['description'] = df_T['description'].str.lower()
-df_T['Interest'] = df_T['Interest'].str.lower()
 df_T['city score'] = np.nan
 df_universities = pd.merge(df_universities, df_cities, left_on='city_id',right_on='id',suffixes=('', '_x'),how = 'inner')
 df_universities = df_universities.loc[:,~df_universities.columns.duplicated()]
@@ -181,43 +177,20 @@ S = [x.strip(' ') for x in S]
 
 
 df_subject = pd.DataFrame(S, columns =['subject'])
-df_subject['subject_score'] = pd.Series([1 for x in range(len(df_subject.index))])
+df_subject['subject_score'] = pd.Series([0.5 for x in range(len(df_subject.index))])
 df_S =  pd.merge(df, df_subject, left_on='name',right_on='subject',suffixes=('', '_x'),how = 'inner')
 df_S = df_S.loc[:,~df_S.columns.duplicated()]
 df_S = pd.merge(df_T, df_S, left_on='touchpointable_id',right_on='touchpointable_id',suffixes=('', '_x'),how = 'outer')
 df_S = df_S.loc[:,~df_S.columns.duplicated()]
-df_degrees = df_degrees.loc[df_degrees['name'] == Degree]
-degree = df_degrees.iloc[0]['name']
-degree = [degree]
-df_degree = pd.DataFrame(degree, columns =['degree'])
-df_degree['degree_score'] = pd.Series([1 for x in range(len(df_degree.index))])
-df_degree =  pd.merge(df, df_degree, left_on='name',right_on='degree',suffixes=('', '_x'),how = 'inner')
-df_degree = df_degree.loc[:,~df_degree.columns.duplicated()]
-O = ['Open to All Students']
-df_degree_1 = pd.DataFrame(O, columns =['degree'])
-df_degree_1['degree_score'] = pd.Series([0 for x in range(len(df_degree_1.index))])
-df_degree_1 =  pd.merge(df, df_degree_1, left_on='name',right_on='degree',suffixes=('', '_x'),how = 'inner')
-df_degree_1 = df_degree_1.loc[:,~df_degree_1.columns.duplicated()]
-df_degree_2 = pd.DataFrame(year, columns =['Year'])
-df_degree_2['year_score'] = pd.Series([1 for x in range(len(df_degree_2.index))])
-df_degree_2 =  pd.merge(df, df_degree_2, left_on='name',right_on='Year',suffixes=('', '_x'),how = 'inner')
-df_degree_2 = df_degree_2.loc[:,~df_degree_2.columns.duplicated()]
-df_D = pd.concat([df_degree,df_degree_1])
-df_D = pd.concat([df_D,df_degree_2])
-    
-df_SD = pd.merge(df_S, df_D, left_on='touchpointable_id',right_on='touchpointable_id',suffixes=('', '_x'),how = 'inner')
-df_SD = df_SD.loc[:,~df_SD.columns.duplicated()]
-df_companies = pd.read_sql('select * from companies', con=engine)
-df_tagging = pd.read_sql('select * from taggings', con=engine)
-df_companies =  pd.merge(df_companies, df_tagging, left_on='id',right_on='taggable_id',suffixes=('', '_x'))
-df_tags = pd.read_sql('select * from tags', con=engine)
-df_companies = pd.merge(df_companies,df_tags,left_on='tag_id',right_on='id',suffixes=('', '_x'))
-df_companies = df_companies.loc[:,~df_companies.columns.duplicated()]
-df_companies['company score'] = pd.Series([1 for x in range(len(df_companies.index))])
-df = pd.merge(df,df_companies,left_on='name',right_on='name',suffixes=('', '_x'))
-df = df.loc[:,~df.columns.duplicated()]
-df = pd.merge(df_SD, df, left_on='touchpointable_id',right_on='touchpointable_id',suffixes=('', '_x'),how = 'outer')
-df = df.groupby('id', as_index=False).first()
+df_S1['degree score'] = np.where(df_S1['name'] == Degree, 1,0)
+df_S2 = df_S1.loc[df_S1['degree score'] == 1]
+df_S2 = pd.merge(df_S1, df_S2, left_on='touchpointable_id',right_on='touchpointable_id',suffixes=('', '_x'),how = 'inner')
+df_S2 = df_S2.loc[:,~df_S2.columns.duplicated()]
+df_S2['year score'] = np.where(df_S2['name'] == Year, 1,0)
+df_S3 = df_S.loc[df_S['name'] == 'Open to All Students']
+df_S3 = pd.merge(df_S, df_S3, left_on='touchpointable_id',right_on='touchpointable_id',suffixes=('', '_x'),how = 'inner')
+df_S3 = df_S3.loc[:,~df_S3.columns.duplicated()]
+df = pd.concat([df_S2,df_S3])
 df = df[['id','touchpointable_id','kind', 'title','name','creatable_for_name','city_name','Weight','Sum','description','city score','subject_score','degree_score','company score']].copy()
 col_list = ['Weight','city score','degree_score','subject_score','company score']
 df['matching score'] = df[col_list].sum(axis=1)
