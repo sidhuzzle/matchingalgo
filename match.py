@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import psycopg2 as pg
 import collections, functools, operator
+from functools import reduce
 from sentence_transformers import SentenceTransformer
 import numpy as np
 from scipy.spatial import distance
