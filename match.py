@@ -121,6 +121,7 @@ for x in Goals:
      df = df.loc[:,~df.columns.duplicated()]
      df =  pd.merge(df, df_goals, left_on='kind',right_on='kind_1',suffixes=('', '_x'),how = 'inner')
      df = df.loc[:,~df.columns.duplicated()]
+     df = reduce(lambda l, r: pd.merge(l, r, on='touchpointable_id', how='inner'), df)
      df_T =  pd.merge(df, df_interest, left_on='name',right_on='Interest',suffixes=('', '_x'),how = 'inner')
      df_T = df_T.loc[:,~df_T.columns.duplicated()]
      df_T['idx'] = df_T.groupby(['touchpointable_id', 'name']).cumcount()
