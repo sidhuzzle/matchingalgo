@@ -59,9 +59,9 @@ year = ['First Year ','Second Year','Third Year','Final Year']
 Year = st.selectbox('Enter the year',year,key = 'seven')
 data = []
 for x in Goals:
-     data.append(pd.DataFrame(goal_dataframe_mapping[x[0]]))
-     data.append(pd.DataFrame(goal_dataframe_mapping[x[1]]))
-     data.append(pd.DataFrame(goal_dataframe_mapping[x[2]]))
+     data.append(pd.DataFrame(goal_dataframe_mapping[x]))
+     data.append(pd.DataFrame(goal_dataframe_mapping[x]))
+     data.append(pd.DataFrame(goal_dataframe_mapping[x]))
 #based on the goals selected corresponding dataframes are printed
      result = dict(functools.reduce(operator.add,map(collections.Counter, data)))   #if same touchpoints are available on goals selected, the values of the touchpoints are added to each other and list will be formed 
 #result = {i:round(j/user_input) if j>1 else j for i,j in result.items()} 
