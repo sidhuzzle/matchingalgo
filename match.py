@@ -40,9 +40,7 @@ goal_dataframe_mapping = {
 
 goals = ['Start my Career with a Spring Week','Get a Summer Internship','Get an Internship alongside my Studies', 'Land a Placement Year','Win Awards & Competitions','Secure a Graduate Job','Find a Co-founder & Start a Business', 'Meet Like-minded Students & join Societies','Expand my Network & Connect with Industry Leaders']
 Goals =  st.multiselect('Enter the goals',goals,key = "one")
-goal_1 = Goal[0]
-goal_2 = Goal[1]
-goal_3 = Goal[2]
+
 interest = st.multiselect('Enter the interest',df_tags['name'].unique(),key = "two")
 weight = [1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,1,2,1]
 Weight = st.multiselect('Enter the weight',weight,key = "three")
@@ -59,10 +57,9 @@ Subject = st.selectbox('Enter the subject',df_subjects['subject_name'].unique(),
 year = ['First Year ','Second Year','Third Year','Final Year']
 Year = st.selectbox('Enter the year',year,key = 'seven')
 data = []
-#for x in Goals:
-data.append(pd.DataFrame(goal_dataframe_mapping[goal_1]))
-data.append(pd.DataFrame(goal_dataframe_mapping[goal_2]))
-data.append(pd.DataFrame(goal_dataframe_mapping[goal_3]))#based on the goals selected corresponding dataframes are printed
+for x in Goals:
+      data.append(pd.DataFrame(goal_dataframe_mapping[x]))
+#based on the goals selected corresponding dataframes are printed
 result = dict(functools.reduce(operator.add,map(collections.Counter, data)))   #if same touchpoints are available on goals selected, the values of the touchpoints are added to each other and list will be formed 
 #result = {i:round(j/user_input) if j>1 else j for i,j in result.items()} 
 #result = {i:round(j/user_input) for i,j in result.items()}
