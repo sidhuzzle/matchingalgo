@@ -60,7 +60,7 @@ Year = st.selectbox('Enter the year',year,key = 'seven')
 data = []
 for x in Goals:
 
-    data.append(pd.DataFrame(goal_dataframe_mapping[Goals[x]]))
+    data.append(pd.DataFrame(goal_dataframe_mapping[x]))
     
 
 
