@@ -58,7 +58,7 @@ Subject = st.selectbox('Enter the subject',df_subjects['subject_name'].unique(),
 year = ['First Year ','Second Year','Third Year','Final Year']
 Year = st.selectbox('Enter the year',year,key = 'seven')
 data = []
-for x in range(0,2):
+for x in Goals:
 
     data.append(pd.DataFrame(goal_dataframe_mapping[Goals[x]]))
     
