@@ -58,84 +58,82 @@ Subject = st.selectbox('Enter the subject',df_subjects['subject_name'].unique(),
 year = ['First Year ','Second Year','Third Year','Final Year']
 Year = st.selectbox('Enter the year',year,key = 'seven')
 data = []
-try:
-    data.append(pd.DataFrame(goal_dataframe_mapping[Goals[0]]))
-    data.append(pd.DataFrame(goal_dataframe_mapping[Goals[1]]))
-    data.append(pd.DataFrame(goal_dataframe_mapping[Goals[2]]))
-except IndexError:
-    pass
+for x in Goals(0,2):
+
+    data.append(pd.DataFrame(goal_dataframe_mapping[Goals[x]]))
+    
+
 
 
 #based on the goals selected corresponding dat. aframes are printed
     result = dict(functools.reduce(operator.add,map(collections.Counter, data)))
 
         #if same touchpoints are available on goals selected, the values of the touchpoints are added to each other and list will be formed 
-    df_goals =  pd.DataFrame(result.items(),columns=['kind_1','value'])
-    df_touchpoints = pd.read_sql('select * from touchpoints', con=engine)
-    grouped_1 = df_touchpoints.groupby(df_touchpoints.state)
-    df_touchpoints = grouped_1.get_group(1)
-    grouped_2 = df_touchpoints.groupby(df_touchpoints.touchpointable_type)
-    df_jobs = grouped_2.get_group("Job")
-    df_1 = pd.read_sql('select * from jobs', con=engine)
-    df_jobs =  pd.merge(df_jobs, df_1, left_on='touchpointable_id',right_on='id',suffixes=('', '_x'))
-    df_jobs = df_jobs.loc[:,~df_jobs.columns.duplicated()]
-    df_tagging = pd.read_sql('select * from taggings', con=engine)
-    df_jobs =  pd.merge(df_jobs, df_tagging, left_on='id',right_on='taggable_id',suffixes=('', '_x'))
-    df_tags = pd.read_sql('select * from tags', con=engine)
-    df_jobs = pd.merge(df_jobs,df_tags,left_on='tag_id',right_on='id',suffixes=('', '_x'))
-    df_jobs = df_jobs.loc[:,~df_jobs.columns.duplicated()]
-    df_jobs['kind'] = df_jobs['kind'].replace([0,1],['Jobs','Jobs'])
+df_goals =  pd.DataFrame(result.items(),columns=['kind_1','value'])
+df_touchpoints = pd.read_sql('select * from touchpoints', con=engine)
+grouped_1 = df_touchpoints.groupby(df_touchpoints.state)
+df_touchpoints = grouped_1.get_group(1)
+grouped_2 = df_touchpoints.groupby(df_touchpoints.touchpointable_type)
+df_jobs = grouped_2.get_group("Job")
+df_1 = pd.read_sql('select * from jobs', con=engine)
+df_jobs =  pd.merge(df_jobs, df_1, left_on='touchpointable_id',right_on='id',suffixes=('', '_x'))
+df_jobs = df_jobs.loc[:,~df_jobs.columns.duplicated()]
+df_tagging = pd.read_sql('select * from taggings', con=engine)
+df_jobs =  pd.merge(df_jobs, df_tagging, left_on='id',right_on='taggable_id',suffixes=('', '_x'))
+df_tags = pd.read_sql('select * from tags', con=engine)
+df_jobs = pd.merge(df_jobs,df_tags,left_on='tag_id',right_on='id',suffixes=('', '_x'))
+df_jobs = df_jobs.loc[:,~df_jobs.columns.duplicated()]
+df_jobs['kind'] = df_jobs['kind'].replace([0,1],['Jobs','Jobs'])
+df_jobs['new_col'] = range(1, len(df_jobs) + 1)
+df_jobs = df_jobs.set_index('new_col')
 
-    df_jobs['new_col'] = range(1, len(df_jobs) + 1)
-    df_jobs = df_jobs.set_index('new_col')
-
-    grouped_3 = df_touchpoints.groupby(df_touchpoints.touchpointable_type)
-    df_events = grouped_3.get_group("Event")
-    df_2 = pd.read_sql('select * from events', con=engine)
-    df_events =  pd.merge(df_events, df_2, left_on='touchpointable_id',right_on='id',suffixes=('', '_x'))
-    df_tagging = pd.read_sql('select * from taggings', con=engine)
-    df_events =  pd.merge(df_events, df_tagging, left_on='id',right_on='taggable_id',suffixes=('', '_x'))
-    df_tags = pd.read_sql('select * from tags', con=engine)
-    df_events = pd.merge(df_events,df_tags,left_on='tag_id',right_on='id',suffixes=('', '_x'))
-    df_events = df_events.loc[:,~df_events.columns.duplicated()]
+grouped_3 = df_touchpoints.groupby(df_touchpoints.touchpointable_type)
+df_events = grouped_3.get_group("Event")
+df_2 = pd.read_sql('select * from events', con=engine)
+df_events =  pd.merge(df_events, df_2, left_on='touchpointable_id',right_on='id',suffixes=('', '_x'))
+df_tagging = pd.read_sql('select * from taggings', con=engine)
+df_events =  pd.merge(df_events, df_tagging, left_on='id',right_on='taggable_id',suffixes=('', '_x'))
+df_tags = pd.read_sql('select * from tags', con=engine)
+df_events = pd.merge(df_events,df_tags,left_on='tag_id',right_on='id',suffixes=('', '_x'))
+df_events = df_events.loc[:,~df_events.columns.duplicated()]
 #df_events = df_events.loc[df_events["kind"] != 0]
-    df_events['kind'] = df_events['kind'].replace([0,1,2,3,4,5,6,7],['Networking & Social','Networking & Social','Career Fairs','Insight Days','Workshops','Conferences & Talks','Conferences & Talks','Competitions'])
-    df_events['new_col'] = range(1, len(df_events) + 1)
-    df_events = df_events.set_index('new_col')
-    grouped_4 = df_touchpoints.groupby(df_touchpoints.touchpointable_type)
-    df_internship = grouped_4.get_group("Internship")
-    df_3 = pd.read_sql('select * from internships', con=engine)
-    df_internship =  pd.merge(df_internship, df_3, left_on='touchpointable_id',right_on='id',suffixes=('', '_x'))
-    df_tagging = pd.read_sql('select * from taggings', con=engine)
-    df_internship =  pd.merge(df_internship, df_tagging, left_on='id',right_on='taggable_id',suffixes=('', '_x'))
-    df_tags = pd.read_sql('select * from tags', con=engine)
-    df_internship = pd.merge(df_internship,df_tags,left_on='tag_id',right_on='id',suffixes=('', '_x'))
-    df_internship = df_internship.loc[:,~df_internship.columns.duplicated()]
-    df_internship['kind'] = df_internship['kind'].replace([0,1,2,3,4],['Spring Weeks','Summer Internship','Off-cycle','Winter','Virtual Internship'])
-    df_internship['new_col'] = range(1, len(df_internship) + 1)
-    df_internship = df_internship.set_index('new_col')
+df_events['kind'] = df_events['kind'].replace([0,1,2,3,4,5,6,7],['Networking & Social','Networking & Social','Career Fairs','Insight Days','Workshops','Conferences & Talks','Conferences & Talks','Competitions'])
+df_events['new_col'] = range(1, len(df_events) + 1)
+df_events = df_events.set_index('new_col')
+grouped_4 = df_touchpoints.groupby(df_touchpoints.touchpointable_type)
+df_internship = grouped_4.get_group("Internship")
+df_3 = pd.read_sql('select * from internships', con=engine)
+df_internship =  pd.merge(df_internship, df_3, left_on='touchpointable_id',right_on='id',suffixes=('', '_x'))
+df_tagging = pd.read_sql('select * from taggings', con=engine)
+df_internship =  pd.merge(df_internship, df_tagging, left_on='id',right_on='taggable_id',suffixes=('', '_x'))
+df_tags = pd.read_sql('select * from tags', con=engine)
+df_internship = pd.merge(df_internship,df_tags,left_on='tag_id',right_on='id',suffixes=('', '_x'))
+df_internship = df_internship.loc[:,~df_internship.columns.duplicated()]
+df_internship['kind'] = df_internship['kind'].replace([0,1,2,3,4],['Spring Weeks','Summer Internship','Off-cycle','Winter','Virtual Internship'])
+df_internship['new_col'] = range(1, len(df_internship) + 1)
+df_internship = df_internship.set_index('new_col')
 
-    df_4 = pd.concat([df_jobs,df_events])
-    df = pd.concat([df_4,df_internship])
-    df_tc = pd.read_sql('select * from touchpoints_cities', con=engine)
-    df = pd.merge(df,df_tc,left_on='id',right_on='touchpoint_id',suffixes=('', '_x'),how = 'left')
-    df = df.loc[:,~df.columns.duplicated()]
-    df_cities = pd.read_sql('select * from cities', con=engine)
-    df_cities.rename(columns = {'name':'city_name'}, inplace = True)
-    df = pd.merge(df,df_cities,left_on='city_id',right_on='id',suffixes=('', '_x'),how = 'left')
-    df = df.loc[:,~df.columns.duplicated()]
-    df =  pd.merge(df, df_goals, left_on='kind',right_on='kind_1',suffixes=('', '_x'),how = 'inner')
-    df = df.loc[:,~df.columns.duplicated()]
+df_4 = pd.concat([df_jobs,df_events])
+df = pd.concat([df_4,df_internship])
+df_tc = pd.read_sql('select * from touchpoints_cities', con=engine)
+df = pd.merge(df,df_tc,left_on='id',right_on='touchpoint_id',suffixes=('', '_x'),how = 'left')
+df = df.loc[:,~df.columns.duplicated()]
+df_cities = pd.read_sql('select * from cities', con=engine)
+df_cities.rename(columns = {'name':'city_name'}, inplace = True)
+df = pd.merge(df,df_cities,left_on='city_id',right_on='id',suffixes=('', '_x'),how = 'left')
+df = df.loc[:,~df.columns.duplicated()]
+df =  pd.merge(df, df_goals, left_on='kind',right_on='kind_1',suffixes=('', '_x'),how = 'inner')
+df = df.loc[:,~df.columns.duplicated()]
      
-    df_T =  pd.merge(df, df_interest, left_on='name',right_on='Interest',suffixes=('', '_x'),how = 'inner')
-    df_T = df_T.loc[:,~df_T.columns.duplicated()]
-    df_T['idx'] = df_T.groupby(['touchpointable_id', 'name']).cumcount()
-    df_T = df_T.pivot(index=['idx','touchpointable_id'], columns='name', values='Weight').sort_index(level=1).reset_index().rename_axis(None, axis=1)
-    df_T.fillna(0)
-    col_list = interest
-    df_T['Sum'] = df_T[col_list].sum(axis=1)
-    df_T = pd.merge(df, df_T, left_on='touchpointable_id',right_on='touchpointable_id',suffixes=('', '_x'),how = 'inner')
-    df_T = df_T.loc[:,~df_T.columns.duplicated()]    
+df_T =  pd.merge(df, df_interest, left_on='name',right_on='Interest',suffixes=('', '_x'),how = 'inner')
+df_T = df_T.loc[:,~df_T.columns.duplicated()]
+df_T['idx'] = df_T.groupby(['touchpointable_id', 'name']).cumcount()
+df_T = df_T.pivot(index=['idx','touchpointable_id'], columns='name', values='Weight').sort_index(level=1).reset_index().rename_axis(None, axis=1)
+df_T.fillna(0)
+col_list = interest
+df_T['Sum'] = df_T[col_list].sum(axis=1)
+df_T = pd.merge(df, df_T, left_on='touchpointable_id',right_on='touchpointable_id',suffixes=('', '_x'),how = 'inner')
+df_T = df_T.loc[:,~df_T.columns.duplicated()]    
      #df_T =  pd.merge(df, df_interest, left_on='name',right_on='Interest',suffixes=('', '_x'),how = 'inner')
      #df_T = df_T.loc[:,~df_T.columns.duplicated()]
      #df_T['idx'] = df_T.groupby(['touchpointable_id', 'name']).cumcount()
@@ -146,14 +144,14 @@ except IndexError:
      
     
      
-    df_T['city score'] = np.nan
-    df_universities = pd.merge(df_universities, df_cities, left_on='city_id',right_on='id',suffixes=('', '_x'),how = 'inner')
-    df_universities = df_universities.loc[:,~df_universities.columns.duplicated()]
-    df_universities = df_universities.loc[df_universities['name'] == University]
-    city_name = df_universities.iloc[0]['city_name']
-    df_T['city score'] = np.where(df_T['city_name'] == city_name, 1,0)
+df_T['city score'] = np.nan
+df_universities = pd.merge(df_universities, df_cities, left_on='city_id',right_on='id',suffixes=('', '_x'),how = 'inner')
+df_universities = df_universities.loc[:,~df_universities.columns.duplicated()]
+df_universities = df_universities.loc[df_universities['name'] == University]
+city_name = df_universities.iloc[0]['city_name']
+df_T['city score'] = np.where(df_T['city_name'] == city_name, 1,0)
  #df_T = df_T[['id','touchpointable_id','kind', 'title','name','createable_for_name','city_name','Weight','description','description_score','city score']].copy()
-    df_subjects =  df_subjects.loc[df_subjects['subject_name'] == Subject]
-    subject_name = df_subjects.iloc[0]['subject_name']  
+df_subjects =  df_subjects.loc[df_subjects['subject_name'] == Subject]
+subject_name = df_subjects.iloc[0]['subject_name']  
  
-    st.write(df_T)
+st.write(df_T)
