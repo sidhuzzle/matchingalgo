@@ -206,6 +206,7 @@ df.fillna(0)
 col_list = ['Weight','city score','degree score','subject_score','year score']
 df['matching score'] = df[col_list].sum(axis=1)
 df = df.sort_values(by='matching score',ascending=False)
+df = df[['id','touchpointable_id','kind', 'title','name','creatable_for_name','city_name','Weight','description','city score','subject_score','degree score','year score]].copy()
  
  
 st.write(df)
