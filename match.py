@@ -197,9 +197,9 @@ except IndexError:
     df_S = df_S.loc[:,~df_S.columns.duplicated()]
     df_S = pd.merge(df_T, df_S, left_on='touchpointable_id',right_on='touchpointable_id',suffixes=('', '_x'),how = 'outer')
     df_S = df_S.loc[:,~df_S.columns.duplicated()]
-    df_S1['degree score'] = np.where(df_S1['name'] == Degree, 1,0)
-    df_S2 = df_S1.loc[df_S1['degree score'] == 1]
-    df_S2 = pd.merge(df_S1, df_S2, left_on='touchpointable_id',right_on='touchpointable_id',suffixes=('', '_x'),how = 'inner')
+    df_S['degree score'] = np.where(df_S['name'] == Degree, 1,0)
+    df_S2 = df_S.loc[df_S['degree score'] == 1]
+    df_S2 = pd.merge(df_S, df_S2, left_on='touchpointable_id',right_on='touchpointable_id',suffixes=('', '_x'),how = 'inner')
     df_S2 = df_S2.loc[:,~df_S2.columns.duplicated()]
     df_S2['year score'] = np.where(df_S2['name'] == Year, 1,0)
     df_S3 = df_S.loc[df_S['name'] == 'Open to All Students']
