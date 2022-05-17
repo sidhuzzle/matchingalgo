@@ -81,7 +81,7 @@ df_jobs =  pd.merge(df_jobs, df_tagging, left_on='id',right_on='taggable_id',suf
 df_tags = pd.read_sql('select * from tags', con=engine)
 df_jobs = pd.merge(df_jobs,df_tags,left_on='tag_id',right_on='id',suffixes=('', '_x'))
 df_jobs = df_jobs.loc[:,~df_jobs.columns.duplicated()]
-df_jobs['kind'] = df_jobs['kind'].replace([0,1],['Jobs','Jobs'])
+df_jobs['kind'] = df_jobs['kind'].replace([0,1],['Graduate Job','Graduate Job'])
 df_jobs['new_col'] = range(1, len(df_jobs) + 1)
 df_jobs = df_jobs.set_index('new_col')
 
@@ -107,7 +107,7 @@ df_internship =  pd.merge(df_internship, df_tagging, left_on='id',right_on='tagg
 df_tags = pd.read_sql('select * from tags', con=engine)
 df_internship = pd.merge(df_internship,df_tags,left_on='tag_id',right_on='id',suffixes=('', '_x'))
 df_internship = df_internship.loc[:,~df_internship.columns.duplicated()]
-df_internship['kind'] = df_internship['kind'].replace([0,1,2,3,4],['Spring Weeks','Summer Internship','Off-cycle','Winter','Virtual Internship'])
+df_internship['kind'] = df_internship['kind'].replace([0,1,2,3,4],['Spring Weeks','Summer','Off-cycle','Winter','Virtual Internship'])
 df_internship['new_col'] = range(1, len(df_internship) + 1)
 df_internship = df_internship.set_index('new_col')
 
@@ -130,8 +130,8 @@ df_T = df_T.pivot(index=['idx','touchpointable_id'], columns='name', values='Wei
 df_T.fillna(0)
 col_list = interest
 df_T['Sum'] = df_T[col_list].sum(axis=1)
-df_T = pd.merge(df, df_T, left_on='touchpointable_id',right_on='touchpointable_id',suffixes=('', '_x'),how = 'inner')
-df_T = df_T.loc[:,~df_T.columns.duplicated()]    
+#df_T = pd.merge(df, df_T, left_on='touchpointable_id',right_on='touchpointable_id',suffixes=('', '_x'),how = 'inner')
+#df_T = df_T.loc[:,~df_T.columns.duplicated()]    
      #df_T =  pd.merge(df, df_interest, left_on='name',right_on='Interest',suffixes=('', '_x'),how = 'inner')
      #df_T = df_T.loc[:,~df_T.columns.duplicated()]
      #df_T['idx'] = df_T.groupby(['touchpointable_id', 'name']).cumcount()
@@ -142,14 +142,14 @@ df_T = df_T.loc[:,~df_T.columns.duplicated()]
      
     
      
-df_T['city score'] = np.nan
-df_universities = pd.merge(df_universities, df_cities, left_on='city_id',right_on='id',suffixes=('', '_x'),how = 'inner')
-df_universities = df_universities.loc[:,~df_universities.columns.duplicated()]
-df_universities = df_universities.loc[df_universities['name'] == University]
-city_name = df_universities.iloc[0]['city_name']
-df_T['city score'] = np.where(df_T['city_name'] == city_name, 1,0)
+#df_T['city score'] = np.nan
+#df_universities = pd.merge(df_universities, df_cities, left_on='city_id',right_on='id',suffixes=('', '_x'),how = 'inner')
+#df_universities = df_universities.loc[:,~df_universities.columns.duplicated()]
+#df_universities = df_universities.loc[df_universities['name'] == University]
+#city_name = df_universities.iloc[0]['city_name']
+#df_T['city score'] = np.where(df_T['city_name'] == city_name, 1,0)
  #df_T = df_T[['id','touchpointable_id','kind', 'title','name','createable_for_name','city_name','Weight','description','description_score','city score']].copy()
-df_subjects =  df_subjects.loc[df_subjects['subject_name'] == Subject]
-subject_name = df_subjects.iloc[0]['subject_name']  
+#df_subjects =  df_subjects.loc[df_subjects['subject_name'] == Subject]
+#subject_name = df_subjects.iloc[0]['subject_name']  
  
-st.write(df)
+st.write(df_T)
