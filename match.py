@@ -123,8 +123,8 @@ df = df.loc[:,~df.columns.duplicated()]
 df =  pd.merge(df, df_goals, left_on='kind',right_on='kind_1',suffixes=('', '_x'),how = 'inner')
 df = df.loc[:,~df.columns.duplicated()]
 #df = df[['id','touchpointable_id','kind','title','name','createable_for_name','description']].copy()    
-df_T =  pd.merge(df, df_interest, left_on='name',right_on='Interest',suffixes=('', '_x'),how = 'inner')
-df_T = df_T.loc[:,~df_T.columns.duplicated()]
+#df_T =  pd.merge(df, df_interest, left_on='name',right_on='Interest',suffixes=('', '_x'),how = 'inner')
+#df_T = df_T.loc[:,~df_T.columns.duplicated()]
 #df_T['idx'] = df_T.groupby(['touchpointable_id', 'name']).cumcount()
 #df_T = df_T.pivot(index=['idx','touchpointable_id'], columns='name', values='Weight').sort_index(level=1).reset_index().rename_axis(None, axis=1)
 #df_T.fillna(0)
