@@ -123,7 +123,7 @@ df = df.loc[:,~df.columns.duplicated()]
 df =  pd.merge(df, df_goals, left_on='kind',right_on='kind_1',suffixes=('', '_x'),how = 'inner')
 df = df.loc[:,~df.columns.duplicated()]
 group_5 = df.groupby(df.type)
-df_T = grouped_5.get_group("Topic")
+df_T = group_5.get_group("Topic")
 #df = df[['id','touchpointable_id','kind','title','name','createable_for_name','description']].copy()    
 df_T =  pd.merge(df_T, df_interest, left_on='name',right_on='Interest',suffixes=('', '_x'),how = 'inner')
 df_T = df_T.loc[:,~df_T.columns.duplicated()]
