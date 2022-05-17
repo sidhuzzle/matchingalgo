@@ -2,8 +2,6 @@ import streamlit as st
 import pandas as pd
 import psycopg2 as pg
 import collections, functools, operator
-
-from sentence_transformers import SentenceTransformer
 import numpy as np
 from scipy.spatial import distance
 st.cache(ttl=24*3600)
