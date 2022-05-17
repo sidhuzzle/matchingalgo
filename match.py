@@ -36,38 +36,6 @@ goal_dataframe_mapping = {
     'Meet Like-minded Students & join Societies':goal_7,
     'Expand my Network & Connect with Industry Leaders':goal_8,
     'No goals selected' : goal_9} 
-
-goals = ['Start my Career with a Spring Week','Get a Summer Internship','Get an Internship alongside my Studies', 'Land a Placement Year','Win Awards & Competitions','Secure a Graduate Job','Find a Co-founder & Start a Business', 'Meet Like-minded Students & join Societies','Expand my Network & Connect with Industry Leaders']
-Goals =  st.multiselect('Enter the goals',goals,key = "one")
-
-interest = st.multiselect('Enter the interest',df_tags['name'].unique(),key = "two")
-weight = [1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,1,2,1]
-Weight = st.multiselect('Enter the weight',weight,key = "three")
-Interest = pd.DataFrame(interest,columns = ['Interest'])
-Weight = pd.DataFrame(Weight,columns = ['Weight'])
-df_interest = pd.concat([Interest,Weight],axis = 1)
-University = st.selectbox('Enter the university',df_universities['name'].unique(),key = 'four')
-Degree =  st.selectbox('Enter the degree',df_degrees['name'].unique(),key = 'five')
-Subject = st.selectbox('Enter the subject',df_subjects['subject_name'].unique(),key = 'six')
-#Subject = pd.DataFrame(Subject,columns = ['Subject'])
-#Score = [1]
-#subjectscore = pd.DataFrame(Score,columns = ['subject score'])
-#df_subject = pd.concat([Subject,subjectscore],axis = 1)
-year = ['First Year ','Second Year','Third Year','Final Year']
-Year = st.selectbox('Enter the year',year,key = 'seven')
-data = []
-for x in Goals:
-
-    data.append(pd.DataFrame(goal_dataframe_mapping[x]))
-    
-
-
-
-#based on the goals selected corresponding dat. aframes are printed
-    result = dict(functools.reduce(operator.add,map(collections.Counter, data)))
-
-        #if same touchpoints are available on goals selected, the values of the touchpoints are added to each other and list will be formed 
-df_goals =  pd.DataFrame(result.items(),columns=['kind_1','value'])
 df_touchpoints = pd.read_sql('select * from touchpoints', con=engine)
 grouped_1 = df_touchpoints.groupby(df_touchpoints.state)
 df_touchpoints = grouped_1.get_group(1)
@@ -120,16 +88,48 @@ df_cities = pd.read_sql('select * from cities', con=engine)
 df_cities.rename(columns = {'name':'city_name'}, inplace = True)
 df = pd.merge(df,df_cities,left_on='city_id',right_on='id',suffixes=('', '_x'),how = 'left')
 df = df.loc[:,~df.columns.duplicated()]
+
+goals = ['Start my Career with a Spring Week','Get a Summer Internship','Get an Internship alongside my Studies', 'Land a Placement Year','Win Awards & Competitions','Secure a Graduate Job','Find a Co-founder & Start a Business', 'Meet Like-minded Students & join Societies','Expand my Network & Connect with Industry Leaders']
+Goals =  st.multiselect('Enter the goals',goals,key = "one")
+
+interest = st.multiselect('Enter the interest',df_tags['name'].unique(),key = "two")
+weight = [1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,1,2,1]
+Weight = st.multiselect('Enter the weight',weight,key = "three")
+Interest = pd.DataFrame(interest,columns = ['Interest'])
+Weight = pd.DataFrame(Weight,columns = ['Weight'])
+df_interest = pd.concat([Interest,Weight],axis = 1)
+University = st.selectbox('Enter the university',df_universities['name'].unique(),key = 'four')
+Degree =  st.selectbox('Enter the degree',df_degrees['name'].unique(),key = 'five')
+Subject = st.selectbox('Enter the subject',df_subjects['subject_name'].unique(),key = 'six')
+#Subject = pd.DataFrame(Subject,columns = ['Subject'])
+#Score = [1]
+#subjectscore = pd.DataFrame(Score,columns = ['subject score'])
+#df_subject = pd.concat([Subject,subjectscore],axis = 1)
+year = ['First Year ','Second Year','Third Year','Final Year']
+Year = st.selectbox('Enter the year',year,key = 'seven')
+data = []
+for x in Goals:
+
+    data.append(pd.DataFrame(goal_dataframe_mapping[x]))
+    
+
+
+
+#based on the goals selected corresponding dat. aframes are printed
+    result = dict(functools.reduce(operator.add,map(collections.Counter, data)))
+
+        #if same touchpoints are available on goals selected, the values of the touchpoints are added to each other and list will be formed 
+df_goals =  pd.DataFrame(result.items(),columns=['kind_1','value'])
 df =  pd.merge(df, df_goals, left_on='kind',right_on='kind_1',suffixes=('', '_x'),how = 'inner')
 df = df.loc[:,~df.columns.duplicated()]
-group_5 = df.groupby(df.type)
-df_T = group_5.get_group("Topic")
+#group_5 = df.groupby(df.type)
+#df_T = group_5.get_group("Topic")
 #df = df[['id','touchpointable_id','kind','title','name','createable_for_name','description']].copy()    
-df_T =  pd.merge(df_T, df_interest, left_on='name',right_on='Interest',suffixes=('', '_x'),how = 'inner')
-df_T = df_T.loc[:,~df_T.columns.duplicated()]
-df_T['idx'] = df_T.groupby(['touchpointable_id', 'name']).cumcount()
-df_T = df_T.pivot(index=['idx','touchpointable_id'], columns='name', values='Weight').sort_index(level=1).reset_index().rename_axis(None, axis=1)
-df_T.fillna(0)
+#df_T =  pd.merge(df_T, df_interest, left_on='name',right_on='Interest',suffixes=('', '_x'),how = 'inner')
+#df_T = df_T.loc[:,~df_T.columns.duplicated()]
+#df_T['idx'] = df_T.groupby(['touchpointable_id', 'name']).cumcount()
+#df_T = df_T.pivot(index=['idx','touchpointable_id'], columns='name', values='Weight').sort_index(level=1).reset_index().rename_axis(None, axis=1)
+#df_T.fillna(0)
 #col_list = interest
 #df_T['Sum'] = df_T[col_list].sum(axis=1)
 #df_T = pd.merge(df, df_T, left_on='touchpointable_id',right_on='touchpointable_id',suffixes=('', '_x'),how = 'inner')
