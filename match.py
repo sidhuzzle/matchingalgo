@@ -154,4 +154,4 @@ df = df.loc[:,~df.columns.duplicated()]
 #df_subjects =  df_subjects.loc[df_subjects['subject_name'] == Subject]
 #subject_name = df_subjects.iloc[0]['subject_name']  
  
-st.write(df_T)
+st.write(df)
