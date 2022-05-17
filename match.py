@@ -122,36 +122,26 @@ for x in Goals:
 df_goals =  pd.DataFrame(result.items(),columns=['kind_1','value'])
 df =  pd.merge(df, df_goals, left_on='kind',right_on='kind_1',suffixes=('', '_x'),how = 'inner')
 df = df.loc[:,~df.columns.duplicated()]
-#group_5 = df.groupby(df.type)
-#df_T = group_5.get_group("Topic")
-#df = df[['id','touchpointable_id','kind','title','name','createable_for_name','description']].copy()    
-#df_T =  pd.merge(df_T, df_interest, left_on='name',right_on='Interest',suffixes=('', '_x'),how = 'inner')
-#df_T = df_T.loc[:,~df_T.columns.duplicated()]
-#df_T['idx'] = df_T.groupby(['touchpointable_id', 'name']).cumcount()
-#df_T = df_T.pivot(index=['idx','touchpointable_id'], columns='name', values='Weight').sort_index(level=1).reset_index().rename_axis(None, axis=1)
-#df_T.fillna(0)
-#col_list = interest
-#df_T['Sum'] = df_T[col_list].sum(axis=1)
-#df_T = pd.merge(df, df_T, left_on='touchpointable_id',right_on='touchpointable_id',suffixes=('', '_x'),how = 'inner')
-#df_T = df_T.loc[:,~df_T.columns.duplicated()]    
-     #df_T =  pd.merge(df, df_interest, left_on='name',right_on='Interest',suffixes=('', '_x'),how = 'inner')
-     #df_T = df_T.loc[:,~df_T.columns.duplicated()]
-     #df_T['idx'] = df_T.groupby(['touchpointable_id', 'name']).cumcount()
-     #df_T = df_T.pivot(index=['idx','touchpointable_id'], columns='name', values='Weight').sort_index(level=1).reset_index().rename_axis(None, axis=1)
-     #df_T.fillna(0)
-     #col_list = interest
-     #df_T['Sum'] = df_T[col_list].sum(axis=1)
-     
-    
-     
-#df_T['city score'] = np.nan
-#df_universities = pd.merge(df_universities, df_cities, left_on='city_id',right_on='id',suffixes=('', '_x'),how = 'inner')
-#df_universities = df_universities.loc[:,~df_universities.columns.duplicated()]
-#df_universities = df_universities.loc[df_universities['name'] == University]
-#city_name = df_universities.iloc[0]['city_name']
-#df_T['city score'] = np.where(df_T['city_name'] == city_name, 1,0)
- #df_T = df_T[['id','touchpointable_id','kind', 'title','name','createable_for_name','city_name','Weight','description','description_score','city score']].copy()
+group_5 = df.groupby(df.type)
+df_T = group_5.get_group("Topic")
+   
+df_T =  pd.merge(df_T, df_interest, left_on='name',right_on='Interest',suffixes=('', '_x'),how = 'inner')
+df_T = df_T.loc[:,~df_T.columns.duplicated()]
+df_T['idx'] = df_T.groupby(['touchpointable_id', 'name']).cumcount()
+df_T = df_T.pivot(index=['idx','touchpointable_id'], columns='name', values='Weight').sort_index(level=1).reset_index().rename_axis(None, axis=1)
+df_T.fillna(0)
+col_list = interest
+df_T['Sum'] = df_T[col_list].sum(axis=1)
+df_T = pd.merge(df, df_T, left_on='touchpointable_id',right_on='touchpointable_id',suffixes=('', '_x'),how = 'inner')
+df_T = df_T.loc[:,~df_T.columns.duplicated()]    
+df_T['city score'] = np.nan
+df_universities = pd.merge(df_universities, df_cities, left_on='city_id',right_on='id',suffixes=('', '_x'),how = 'inner')
+df_universities = df_universities.loc[:,~df_universities.columns.duplicated()]
+df_universities = df_universities.loc[df_universities['name'] == University]
+city_name = df_universities.iloc[0]['city_name']
+df_T['city score'] = np.where(df_T['city_name'] == city_name, 1,0)
+df_T = df_T[['id','touchpointable_id','kind', 'title','name','createable_for_name','city_name','Weight','description','description_score','city score']].copy()
 #df_subjects =  df_subjects.loc[df_subjects['subject_name'] == Subject]
 #subject_name = df_subjects.iloc[0]['subject_name']  
  
-st.write(df)
+st.write(df_T)
