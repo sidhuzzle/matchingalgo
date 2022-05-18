@@ -87,23 +87,22 @@ df = pd.merge(df,df_cities,left_on='city_id',right_on='id',suffixes=('', '_x'),h
 df = df.loc[:,~df.columns.duplicated()]
 data = []
 Goals =  st.multiselect('Enter the goals',goals,key = "one")
-st.cache(ttl=24*3600)
 for x in Goals:
      data.append(pd.DataFrame(goal_dataframe_mapping[x]))
      result = dict(functools.reduce(operator.add,map(collections.Counter, data)))
 df_goals =  pd.DataFrame(result.items(),columns=['kind_1','value'])
 df =  pd.merge(df, df_goals, left_on='kind',right_on='kind_1',suffixes=('', '_x'),how = 'inner')
 df = df.loc[:,~df.columns.duplicated()]
-interest = st.multiselect('Enter the interest',df_tags['name'].unique(),key = "two")
 st.cache(ttl=24*3600)
+interest = st.multiselect('Enter the interest',df_tags['name'].unique(),key = "two")
 weight = [1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,1,2,1]
 Weight = st.multiselect('Enter the weight',weight,key = "three")
-st.cache(ttl=24*3600)
 Interest = pd.DataFrame(interest,columns = ['Interest'])
 Weight = pd.DataFrame(Weight,columns = ['Weight'])
 df_interest = pd.concat([Interest,Weight],axis = 1)
 df_T =  pd.merge(df, df_interest, left_on='name',right_on='Interest',suffixes=('', '_x'),how = 'inner')
 df_T = df_T.loc[:,~df_T.columns.duplicated()]
+st.cache(ttl=24*3600)
 df_T['idx'] = df_T.groupby(['touchpointable_id', 'name']).cumcount()
 df_T = df_T.pivot(index=['idx','touchpointable_id'], columns='name', values='Weight').sort_index(level=1).reset_index().rename_axis(None, axis=1)
 df_T.fillna(0)
@@ -111,6 +110,7 @@ col_list = interest
 df_T['Weight'] = df_T[col_list].sum(axis=1)
 df_T = pd.merge(df, df_T, left_on='touchpointable_id',right_on='touchpointable_id',suffixes=('', '_x'),how = 'inner')
 df_T = df_T.loc[:,~df_T.columns.duplicated()]
+st.cache(ttl=24*3600)
 University = st.selectbox('Enter the university',df_universities['name'].unique(),key = 'four')
 st.cache(ttl=24*3600)
 df_T['city score'] = np.nan
