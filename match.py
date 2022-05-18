@@ -3,7 +3,6 @@ import pandas as pd
 import psycopg2 as pg
 import collections, functools, operator
 import numpy as np
-@st.cache(ttl=24*3600)
 engine = pg.connect("dbname='huzzle_staging' user='postgres' host='huzzle-staging.ct4mk1ahmp9p.eu-central-1.rds.amazonaws.com' port='5432' password='2Yw*PG9x-FcWvc7R'")
 df_tags = pd.read_sql('select * from tags', con=engine)
 df_degrees = pd.read_sql('select * from degrees', con=engine)
@@ -113,7 +112,7 @@ df =  pd.merge(df, df_goals, left_on='kind',right_on='kind_1',suffixes=('', '_x'
 df = df.loc[:,~df.columns.duplicated()]
 #group_5 = df.groupby(df.type)
 #df_T = group_5.get_group("Topic")
-   
+@st.cache   
 df_T =  pd.merge(df, df_interest, left_on='name',right_on='Interest',suffixes=('', '_x'),how = 'inner')
 df_T = df_T.loc[:,~df_T.columns.duplicated()]
 df_T['idx'] = df_T.groupby(['touchpointable_id', 'name']).cumcount()
