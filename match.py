@@ -146,7 +146,7 @@ df_S = df_S.loc[:,~df_S.columns.duplicated()]
 df_S = pd.merge(df_T, df_S, left_on='touchpointable_id',right_on='touchpointable_id',suffixes=('', '_x'),how = 'outer')
 df_S = df_S.loc[:,~df_S.columns.duplicated()]
 df_S = df_S[['id','touchpointable_id','kind', 'title','name','creatable_for_name','city_name','Weight','description','city score','subject','subject_score']].copy()
-Degree =  st.selectbox('Enter the degree',df_degrees['name'].unique(),key = 'six)
+Degree =  st.selectbox('Enter the degree',df_degrees['name'].unique(),key = 'six')
 df_S['degree score'] = np.where(df_S['name'] == Degree, 1,0)
 df_S2 = df_S.loc[df_S['degree score'] == 1]
 df_S2 = pd.merge(df,df_S2, left_on='touchpointable_id',right_on='touchpointable_id',suffixes=('', '_x'),how = 'inner')
