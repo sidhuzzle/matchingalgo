@@ -112,7 +112,7 @@ df =  pd.merge(df, df_goals, left_on='kind',right_on='kind_1',suffixes=('', '_x'
 df = df.loc[:,~df.columns.duplicated()]
 #group_5 = df.groupby(df.type)
 #df_T = group_5.get_group("Topic")
-@st.cache   
+@st.cache(suppress_st_warning=True)   
 df_T =  pd.merge(df, df_interest, left_on='name',right_on='Interest',suffixes=('', '_x'),how = 'inner')
 df_T = df_T.loc[:,~df_T.columns.duplicated()]
 df_T['idx'] = df_T.groupby(['touchpointable_id', 'name']).cumcount()
