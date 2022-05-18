@@ -4,7 +4,6 @@ import psycopg2 as pg
 import collections, functools, operator
 import numpy as np
 st.cache(ttl=72*7200)
-
 engine = pg.connect("dbname='huzzle_staging' user='postgres' host='huzzle-staging.ct4mk1ahmp9p.eu-central-1.rds.amazonaws.com' port='5432' password='2Yw*PG9x-FcWvc7R'")
 df_tags = pd.read_sql('select * from tags', con=engine)
 df_degrees = pd.read_sql('select * from degrees', con=engine)
@@ -23,7 +22,6 @@ goal_6 = [{'Networking & Social':4,'Conferences & Talks':3,'Competitions':3}]
 goal_7 = [{'Networking & Social':3,'Workshops':2,'Conferences & Talks':2,'Competitions':3}]
 goal_8 = [{'Networking & Social':2,'Career Fairs':2,'Insight Days':2,'Workshops':2,'Conferences & Talks':2}]
 goal_9 = [{'no goals'}]
-
 goal_dataframe_mapping = {
     'Start my Career with a Spring Week':goal_0,                                   #mapping  goals with touchpoints
     'Get a Summer Internship':goal_1,
@@ -53,7 +51,6 @@ df_jobs = df_jobs.loc[:,~df_jobs.columns.duplicated()]
 df_jobs['kind'] = df_jobs['kind'].replace([0,1],['Graduate Job','Graduate Job'])
 df_jobs['new_col'] = range(1, len(df_jobs) + 1)
 df_jobs = df_jobs.set_index('new_col')
-
 grouped_3 = df_touchpoints.groupby(df_touchpoints.touchpointable_type)
 df_events = grouped_3.get_group("Event")
 df_2 = pd.read_sql('select * from events', con=engine)
@@ -63,7 +60,6 @@ df_events =  pd.merge(df_events, df_tagging, left_on='id',right_on='taggable_id'
 df_tags = pd.read_sql('select * from tags', con=engine)
 df_events = pd.merge(df_events,df_tags,left_on='tag_id',right_on='id',suffixes=('', '_x'))
 df_events = df_events.loc[:,~df_events.columns.duplicated()]
-#df_events = df_events.loc[df_events["kind"] != 0]
 df_events['kind'] = df_events['kind'].replace([0,1,2,3,4,5,6,7],['Networking & Social','Networking & Social','Career Fairs','Insight Days','Workshops','Conferences & Talks','Conferences & Talks','Competitions'])
 df_events['new_col'] = range(1, len(df_events) + 1)
 df_events = df_events.set_index('new_col')
@@ -88,26 +84,20 @@ df_cities = pd.read_sql('select * from cities', con=engine)
 df_cities.rename(columns = {'name':'city_name'}, inplace = True)
 df = pd.merge(df,df_cities,left_on='city_id',right_on='id',suffixes=('', '_x'),how = 'left')
 df = df.loc[:,~df.columns.duplicated()]
+data = []
 Goals =  st.multiselect('Enter the goals',goals,key = "one")
+for x in Goals:
+     data.append(pd.DataFrame(goal_dataframe_mapping[x]))
+     result = dict(functools.reduce(operator.add,map(collections.Counter, data)))
+df_goals =  pd.DataFrame(result.items(),columns=['kind_1','value'])
+df =  pd.merge(df, df_goals, left_on='kind',right_on='kind_1',suffixes=('', '_x'),how = 'inner')
+df = df.loc[:,~df.columns.duplicated()]
 interest = st.multiselect('Enter the interest',df_tags['name'].unique(),key = "two")
 weight = [1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,1,2,1]
 Weight = st.multiselect('Enter the weight',weight,key = "three")
 Interest = pd.DataFrame(interest,columns = ['Interest'])
 Weight = pd.DataFrame(Weight,columns = ['Weight'])
 df_interest = pd.concat([Interest,Weight],axis = 1)
-University = st.selectbox('Enter the university',df_universities['name'].unique(),key = 'four')
-Degree =  st.selectbox('Enter the degree',df_degrees['name'].unique(),key = 'five')
-Subject = st.selectbox('Enter the subject',df_subjects['subject_name'].unique(),key = 'six')
-year = ['First Year ','Second Year','Third Year','Final Year']
-Year = st.selectbox('Enter the year',year,key = 'seven')
-data = []
-for x in Goals:
-
-    data.append(pd.DataFrame(goal_dataframe_mapping[x]))
-    result = dict(functools.reduce(operator.add,map(collections.Counter, data)))
-df_goals =  pd.DataFrame(result.items(),columns=['kind_1','value'])
-df =  pd.merge(df, df_goals, left_on='kind',right_on='kind_1',suffixes=('', '_x'),how = 'inner')
-df = df.loc[:,~df.columns.duplicated()]
 df_T =  pd.merge(df, df_interest, left_on='name',right_on='Interest',suffixes=('', '_x'),how = 'inner')
 df_T = df_T.loc[:,~df_T.columns.duplicated()]
 df_T['idx'] = df_T.groupby(['touchpointable_id', 'name']).cumcount()
@@ -116,7 +106,8 @@ df_T.fillna(0)
 col_list = interest
 df_T['Weight'] = df_T[col_list].sum(axis=1)
 df_T = pd.merge(df, df_T, left_on='touchpointable_id',right_on='touchpointable_id',suffixes=('', '_x'),how = 'inner')
-df_T = df_T.loc[:,~df_T.columns.duplicated()]    
+df_T = df_T.loc[:,~df_T.columns.duplicated()]
+University = st.selectbox('Enter the university',df_universities['name'].unique(),key = 'four')
 df_T['city score'] = np.nan
 df_universities = pd.merge(df_universities, df_cities, left_on='city_id',right_on='id',suffixes=('', '_x'),how = 'inner')
 df_universities = df_universities.loc[:,~df_universities.columns.duplicated()]
@@ -124,6 +115,8 @@ df_universities = df_universities.loc[df_universities['name'] == University]
 city_name = df_universities.iloc[0]['city_name']
 df_T['city score'] = np.where(df_T['city_name'] == city_name, 1,0)
 df_T = df_T[['id','touchpointable_id','kind', 'title','name','creatable_for_name','city_name','Weight','description','city score']].copy()
+Degree =  st.selectbox('Enter the degree',df_degrees['name'].unique(),key = 'five')
+Subject = st.selectbox('Enter the subject',df_subjects['subject_name'].unique(),key = 'five')
 S = []
 if ',' in Subject:
         subject_0 = Subject.split(', ')
@@ -153,10 +146,13 @@ df_S = df_S.loc[:,~df_S.columns.duplicated()]
 df_S = pd.merge(df_T, df_S, left_on='touchpointable_id',right_on='touchpointable_id',suffixes=('', '_x'),how = 'outer')
 df_S = df_S.loc[:,~df_S.columns.duplicated()]
 df_S = df_S[['id','touchpointable_id','kind', 'title','name','creatable_for_name','city_name','Weight','description','city score','subject','subject_score']].copy()
+Degree =  st.selectbox('Enter the degree',df_degrees['name'].unique(),key = 'six)
 df_S['degree score'] = np.where(df_S['name'] == Degree, 1,0)
 df_S2 = df_S.loc[df_S['degree score'] == 1]
 df_S2 = pd.merge(df,df_S2, left_on='touchpointable_id',right_on='touchpointable_id',suffixes=('', '_x'),how = 'inner')
 df_S2 = df_S2.loc[:,~df_S2.columns.duplicated()]
+year = ['First Year ','Second Year','Third Year','Final Year']
+Year = st.selectbox('Enter the year',year,key = 'seven')
 df_S2['year score'] = np.where(df_S2['name'] == Year, 1,0)
 group_5 = df.groupby(df.type)
 df_E = group_5.get_group("Education Requirments")
