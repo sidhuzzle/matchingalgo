@@ -155,7 +155,7 @@ year = ['First Year ','Second Year','Third Year','Final Year']
 Year = st.selectbox('Enter the year',year,key = 'seven')
 df_S2['year score'] = np.where(df_S2['name'] == Year, 1,0)
 group_5 = df.groupby(df.type)
-df_E = group_5.get_group("Education Requirments")
+df_E = group_5.get_group("EducationRequirement")
 df_S3 = df_E.loc[df_E['name'] == 'Open to All Students']
 df_S3 = pd.merge(df_S, df_S3, left_on='touchpointable_id',right_on='touchpointable_id',suffixes=('', '_x'),how = 'inner')
 df_S3 = df_S3.loc[:,~df_S3.columns.duplicated()]
