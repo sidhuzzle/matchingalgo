@@ -55,7 +55,7 @@ Interest = pd.DataFrame(interest,columns = ['Interest'])
 Weight = pd.DataFrame(Weight,columns = ['Weight'])
 df_interest = pd.concat([Interest,Weight],axis = 1)
 University = st.selectbox('Enter the university',df_universities['name'].unique(),key = 'four')
-Subject = st.selectbox('Enter the subject',df_subjects['subject_name'].unique(),key = 'five')
+Subject = st.selectbox('Enter the subject',df_subjects['name'].unique(),key = 'five')
 Degree =  st.selectbox('Enter the degree',df_degrees['name'].unique(),key = 'six')
 year = ['First Year ','Second Year','Third Year','Final Year']
 Year = st.selectbox('Enter the year',year,key = 'seven')
@@ -69,7 +69,6 @@ df =  pd.merge(df, df_goals, left_on='kind',right_on='kind_1',suffixes=('', '_x'
 df = df.loc[:,~df.columns.duplicated()]
 group_6 = df.groupby(df.type)
 df_T = group_6.get_group("Topic")
-st.cache(suppress_st_warning=True)   
 df_T =  pd.merge(df_T, df_interest, left_on='name',right_on='Interest',suffixes=('', '_x'),how = 'inner')
 df_T = df_T.loc[:,~df_T.columns.duplicated()]
 df_T = df_T.pivot(index=['touchpointable_id'], columns='name', values='Weight').sort_index(level=1).reset_index().rename_axis(None, axis=1)
