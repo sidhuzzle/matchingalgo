@@ -25,6 +25,8 @@ df = df.loc[:,~df.columns.duplicated()]
 df_cities.rename(columns = {'name':'city_name'}, inplace = True)
 df = pd.merge(df,df_cities,left_on='city_id',right_on='id',suffixes=('', '_x'),how = 'left')
 df = df.loc[:,~df.columns.duplicated()]
+group_6 = df.groupby(df.type)
+df_T = group_6.get_group("Topic")
 goal_0 = [{'Spring Weeks':7, 'Virtual Internship':3, 'Career Fairs':3,'Insight Days':5,'Competitions':2}]                                      #Initialing touchpoint weights,later on this will be converted to dataframe
 goal_1 = [{'Summer':10, 'Networking & Social':3,'Career Fairs':3,'Insight Days':2,'Workshops':2}]
 goal_2 = [{'Virtual Internship':3, 'Off-cycle':7, 'Networking & Social':5,'Career Fairs':2,'Conferences & Talks':3}]
@@ -68,8 +70,6 @@ for x in Goals:
 df_goals =  pd.DataFrame(result.items(),columns=['kind_1','value'])
 df =  pd.merge(df, df_goals, left_on='kind',right_on='kind_1',suffixes=('', '_x'),how = 'inner')
 df = df.loc[:,~df.columns.duplicated()]
-group_6 = df.groupby(df.type)
-df_T = group_6.get_group("Topic")
 df_T =  pd.merge(df_T, df_interest, left_on='name',right_on='Interest',suffixes=('', '_x'),how = 'inner')
 df_T = df_T.loc[:,~df_T.columns.duplicated()]
 df_T = df_T.pivot(index=['touchpointable_id'], columns='name', values='Weight').sort_index(level=1).reset_index().rename_axis(None, axis=1)
