@@ -51,7 +51,7 @@ goal_dataframe_mapping = {
 goals = ['Start my Career with a Spring Week','Get a Summer Internship','Get an Internship alongside my Studies', 'Land a Placement Year','Win Awards & Competitions','Secure a Graduate Job','Find a Co-founder & Start a Business', 'Meet Like-minded Students & join Societies','Expand my Network & Connect with Industry Leaders']
 
 Goals =  st.multiselect('Enter the goals',goals,key = "one")
-interest = st.multiselect('Enter the interest',df_tags['name'].unique(),key = "two")
+interest = st.multiselect('Enter the interest',df_T['name'].unique(),key = "two")
 weight = [1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,1,2,1]
 Weight = st.multiselect('Enter the weight',weight,key = "three")
 Interest = pd.DataFrame(interest,columns = ['Interest'])
