@@ -25,6 +25,8 @@ df = df.loc[:,~df.columns.duplicated()]
 df_cities.rename(columns = {'name':'city_name'}, inplace = True)
 df = pd.merge(df,df_cities,left_on='city_id',right_on='id',suffixes=('', '_x'),how = 'left')
 df = df.loc[:,~df.columns.duplicated()]
+df_universities = pd.merge(df_universities, df_cities, left_on='city_id',right_on='id',suffixes=('', '_x'),how = 'inner')
+df_universities = df_universities.loc[:,~df_universities.columns.duplicated()]
 group_6 = df.groupby(df.type)
 df_T = group_6.get_group("Topic")
 goal_0 = [{'Spring Weeks':7, 'Virtual Internship':3, 'Career Fairs':3,'Insight Days':5,'Competitions':2}]                                      #Initialing touchpoint weights,later on this will be converted to dataframe
@@ -48,6 +50,7 @@ goal_dataframe_mapping = {
     'Meet Like-minded Students & join Societies':goal_7,
     'Expand my Network & Connect with Industry Leaders':goal_8,
     'No goals selected' : goal_9} 
+
 goals = ['Start my Career with a Spring Week','Get a Summer Internship','Get an Internship alongside my Studies', 'Land a Placement Year','Win Awards & Competitions','Secure a Graduate Job','Find a Co-founder & Start a Business', 'Meet Like-minded Students & join Societies','Expand my Network & Connect with Industry Leaders']
 
 Goals =  st.multiselect('Enter the goals',goals,key = "one")
@@ -64,7 +67,6 @@ year = ['First Year ','Second Year','Third Year','Final Year']
 Year = st.selectbox('Enter the year',year,key = 'seven')
 data = []
 for x in Goals:
-
     data.append(pd.DataFrame(goal_dataframe_mapping[x]))
     result = dict(functools.reduce(operator.add,map(collections.Counter, data)))
 df_goals =  pd.DataFrame(result.items(),columns=['kind_1','value'])
@@ -72,15 +74,15 @@ df =  pd.merge(df, df_goals, left_on='kind',right_on='kind_1',suffixes=('', '_x'
 df = df.loc[:,~df.columns.duplicated()]
 df_T =  pd.merge(df_T, df_interest, left_on='name',right_on='Interest',suffixes=('', '_x'),how = 'inner')
 df_T = df_T.loc[:,~df_T.columns.duplicated()]
-df_T = df_T.pivot(index=['touchpointable_id'], columns='name', values='Weight').sort_index(level=1).reset_index().rename_axis(None, axis=1)
+df_T['idx'] = df_T.groupby(['touchpointable_id', 'name']).cumcount()
+df_T = df_T.pivot(index=['idx','touchpointable_id'], columns='name', values='Weight').sort_index(level=1).reset_index().rename_axis(None, axis=1)
 df_T = df_T.fillna(0)
 col_list = interest
 df_T['Weight'] = df_T[col_list].sum(axis=1)
 df_T = pd.merge(df, df_T, left_on='touchpointable_id',right_on='touchpointable_id',suffixes=('', '_x'),how = 'inner')
-df_T = df_T.loc[:,~df_T.columns.duplicated()]    
+df_T = df_T.loc[:,~df_T.columns.duplicated()]
+df_T = df_T[['id','touchpointable_id','kind', 'title','name','creatable_for_name','Weight','city_name']].copy()
 df_T['city score'] = np.nan
-df_universities = pd.merge(df_universities, df_cities, left_on='city_id',right_on='id',suffixes=('', '_x'),how = 'inner')
-df_universities = df_universities.loc[:,~df_universities.columns.duplicated()]
 df_universities = df_universities.loc[df_universities['name'] == University]
 city_name = df_universities.iloc[0]['city_name']
 df_T['city score'] = np.where(df_T['city_name'] == city_name, 1,0)
@@ -127,8 +129,10 @@ df_S = df_S.loc[:,~df_S.columns.duplicated()]
 df_S = df_S[['id','touchpointable_id','kind', 'title','name','creatable_for_name','city_name','Weight','description','city score','subject','subject_score']].copy()
 df_S['degree score'] = np.where(df_S['name'] == Degree, 1,0)
 df_S2 = df_S.loc[df_S['degree score'] == 1]
+df_S2 = df_S2.groupby('id', as_index=False).first()
 df_S2 = pd.merge(df,df_S2, left_on='touchpointable_id',right_on='touchpointable_id',suffixes=('', '_x'),how = 'inner')
 df_S2 = df_S2.loc[:,~df_S2.columns.duplicated()]
+df_S2 = df_S2[['id','touchpointable_id','kind', 'title','name','creatable_for_name','city_name','Weight','description','city score','subject','subject_score','degree score']].copy()
 df_S2['year score'] = np.where(df_S2['name'] == Year, 1,0)
 group_5 = df.groupby(df.type)
 df_E = group_5.get_group("EducationRequirement")
@@ -148,5 +152,5 @@ df.fillna(0)
 col_list = ['Weight','city score','degree score','subject_score','year score']
 df['matching score'] = df[col_list].sum(axis=1)
 df = df.sort_values(by='matching score',ascending=False)
-df = df[['id','touchpointable_id','kind', 'title','name','creatable_for_name','city_name','Weight','description','city score','subject_score','degree score','year score']].copy()
+df = df[['id','touchpointable_id','kind', 'title','name','creatable_for_name','city_name','Weight','description','city score','subject_score','degree score','year score','matching score']].copy()
 st.write(df)
