@@ -503,7 +503,7 @@ Events =  pd.merge(df, Events, left_on='id',right_on='id',suffixes=('', '_x'),ho
 Events = Events.loc[:,~Events.columns.duplicated()]
 Events = Events.iloc[:20]
 group_12 = matches.groupby(matches.touchpointable_type)
-Jobs = group_12.get_group("Graduate Job")
+Jobs = group_12.get_group("Jobs")
 Jobs =  pd.merge(df, Jobs, left_on='id',right_on='id',suffixes=('', '_x'),how = 'inner')
 Jobs = Jobs.loc[:,~Jobs.columns.duplicated()]
 Jobs = Jobs.iloc[:20]
