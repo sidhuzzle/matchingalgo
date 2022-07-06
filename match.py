@@ -507,7 +507,7 @@ Jobs = group_12.get_group("Job")
 Jobs =  pd.merge(df, Jobs, left_on='id',right_on='id',suffixes=('', '_x'),how = 'inner')
 Jobs = Jobs.loc[:,~Jobs.columns.duplicated()]
 Jobs = Jobs.iloc[:20]
-if st.button('Submit',key = eight):
+if st.button('Submit',key = 'eight'):
   
     st.write(Internship)
     st.write(Events)
