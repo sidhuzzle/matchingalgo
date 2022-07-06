@@ -498,7 +498,7 @@ Internship =  pd.merge(df, Internship, left_on='id',right_on='id',suffixes=('', 
 Internship = Internship.loc[:,~Internship.columns.duplicated()]
 Internship = Internship.iloc[:20]
 group_11 = matches.groupby(matches.touchpointable_type)
-Events = group_11.get_group("Events")
+Events = group_11.get_group("Event")
 Events =  pd.merge(df, Events, left_on='id',right_on='id',suffixes=('', '_x'),how = 'inner')
 Events = Events.loc[:,~Events.columns.duplicated()]
 Events = Events.iloc[:20]
