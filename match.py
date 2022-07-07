@@ -29,7 +29,7 @@ df = df.loc[:,~df.columns.duplicated()]
 df_cities.rename(columns = {'name':'city_name'}, inplace = True)
 df = pd.merge(df,df_cities,left_on='city_id',right_on='id',suffixes=('', '_x'),how = 'left')
 df = df.loc[:,~df.columns.duplicated()]
-df_universities = pd.merge(df_universities, df_cities, left_on='city_id',right_on='id',suffixes=('', '_x'),how = 'inner')
+df_universities = pd.merge(df_universities, df_cities, left_on='city_id',right_on='id',suffixes=('', '_x'),how = 'outer')
 df_universities = df_universities.loc[:,~df_universities.columns.duplicated()]
 group_6 = df.groupby(df.type)
 df_T = group_6.get_group("Topic")
