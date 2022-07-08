@@ -14,6 +14,8 @@ df_cities.rename(columns = {'name':'city_name'}, inplace = True)
 df_subjects = pd.read_sql('select * from subjects', con=engine)
 subject_topics = pd.read_sql('select * from subjects_topics', con=engine)
 df_degrees = pd.read_sql('select * from degrees', con=engine)
+df_degrees.rename(columns = {'name':'Bachelors'}, inplace = True)
+df_degrees.rename(columns = {'name':'Masters'}, inplace = True)
 df_tc = pd.read_sql('select * from touchpoints_cities', con=engine)
 df_goals = pd.read_sql('select * from goals', con=engine)
 
@@ -29,8 +31,8 @@ df = df.loc[:,~df.columns.duplicated()]
 df_cities.rename(columns = {'name':'city_name'}, inplace = True)
 df = pd.merge(df,df_cities,left_on='city_id',right_on='id',suffixes=('', '_x'),how = 'left')
 df = df.loc[:,~df.columns.duplicated()]
-df_universities = pd.merge(df_universities, df_cities, left_on='city_id',right_on='id',suffixes=('', '_x'),how = 'outer')
-df_universities = df_universities.loc[:,~df_universities.columns.duplicated()]
+df_universities_1 = pd.merge(df_universities, df_cities, left_on='city_id',right_on='id',suffixes=('', '_x'),how = 'left')
+df_universities_1 = df_universities_1.loc[:,~df_universities_1.columns.duplicated()]
 group_6 = df.groupby(df.type)
 df_T = group_6.get_group("Topic")
 df_goals = pd.merge(df_goals, df_goal_weights, left_on='id',right_on='goal_id',suffixes=('', '_x'),how = 'inner')
@@ -87,8 +89,8 @@ if len(interest) == 0:
   df_I['Weight'] = 0
   
 
-df_universities = df_universities.loc[df_universities['name'] == University]
-city_name = df_universities.iloc[0]['city_name']
+df_universities_1 = df_universities_1.loc[df_universities_1['name'] == University]
+city_name = df_universities_1.iloc[0]['city_name']
 df_I['city score'] = np.where(df_I['city_name'] == city_name, 1,0)
 
 df_I['degree score'] = np.where(df_I['name'] == Degree, 1,0)
@@ -145,371 +147,16 @@ df_A = pd.concat([df_A,df_O])
 
 df_A = df_A.groupby('id', as_index=False).first()
 df_A = df_A.sort_values(by='matching score',ascending=False)
-kind = df_A['kind'].unique()
+df_A = df_A.groupby(["kind","value"])
+for group,df in df_A:
+  df = pd.DataFrame(df)
+  n = df['value'].iloc[0]
+  n = round(len(df)*(n/10))
+  if n == 0:
+      n = n+1
+      
+  df = df.head(n)
 
-if "Start my Career with a Spring Week":
-  
-  if "Spring Weeks" in kind:
-    
-    group_1 = df_A.groupby(df_A.kind)
-    df_S = group_1.get_group("Spring Weeks")
-    df_A = df_A.sort_values(by='matching score',ascending=True)
-    print(df_S)
-    df_S = df_S.sample(frac = 0.7)
-  else:
-    df_S = df_A.iloc[:1]
-    df_S = df_S.fillna(0)
-
-  if 'Virtual Internship' in kind:
-    group_2 = df_A.groupby(df_A.kind)
-    df_V = group_2.get_group("Virtual Internship")
-    df_V = df_V.sample(frac = 0.3)
-  else:
-    df_V = df_A.iloc[:1]
-    df_V = df_V.fillna(0)
-  if 'Career Fairs' in kind:
-    group_3 = df_A.groupby(df_A.kind)
-    df_C = group_3.get_group("Career Fairs")
-    df_C = df_C.sample(frac = 0.3)
-  else:
-    df_C = df_A.iloc[:1]
-    df_C = df_C.fillna(0)
-  if 'Insight Days' in kind:
-    group_4 = df_A.groupby(df_A.kind)
-    df_I = group_4.get_group("Insight Days")
-    df_I = df_I.sample(frac = 0.5)
-  else:
-    df_I = df_A.iloc[:1]
-    df_I = df_I.fillna(0)
-  if 'Competitions' in kind:
-    group_5 = df_A.groupby(df_A.kind)
-    df_c = group_5.get_group("Competitions")
-    df_c = df_c.sample(frac = 0.2)
-  else:
-    df_c = df_A.iloc[:1]
-    df_c = df_c.fillna(0)
-
-df_1 = pd.concat([df_S,df_V])
-df_1 = pd.concat([df_1,df_C])
-df_1 = pd.concat([df_1,df_I])
-df_1 = pd.concat([df_1,df_c])
-
-
-
-if 'Get a Summer Internship' in goals:
-  if "Summer" in kind:
-    group_1 = df_A.groupby(df_A.kind)
-    df_S = group_1.get_group("Summer")
-    df_S = df_S.sample(frac = 1.0)
-  else:
-    df_S = df_A.iloc[:1]
-    df_S = df_S.fillna(0)
-  if 'Networking' in kind:
-    group_2 = df_A.groupby(df_A.kind)
-    df_V = group_2.get_group("Networking")
-    df_V = df_V.sample(frac = 0.3)
-  else:
-    df_V = df_A.iloc[:1]
-    df_V = df_V.fillna(0)
-  if 'Career Fairs' in kind:
-    group_3 = df_A.groupby(df_A.kind)
-    df_C = group_3.get_group("Career Fairs")
-    df_C = df_C.sample(frac = 0.3)
-  else:
-    df_C = df_A.iloc[:1]
-    df_C = df_C.fillna(0)
-  if 'Insight Days' in kind:
-    group_4 = df_A.groupby(df_A.kind)
-    df_I = group_4.get_group("Insight Days")
-    df_I = df_I.sample(frac = 0.2)
-  else:
-    df_I = df_A.iloc[:1]
-    df_I = df_I.fillna(0)
-  if 'Workshop' in kind:
-    group_5 = df_A.groupby(df_A.kind)
-    df_c = group_5.get_group("Workshop")
-    df_c = df_c.sample(frac = 0.2)
-  else:
-    df_c = df_A.iloc[:1]
-    df_c = df_c.fillna(0)
-
-df_2 = pd.concat([df_S,df_V])
-df_2 = pd.concat([df_2,df_C])
-df_2 = pd.concat([df_2,df_I])
-df_2 = pd.concat([df_2,df_c])
-
-if 'Expand my Network & Connect with Industry Leaders ' in goals:
-  if "Conference" in kind:
-    group_1 = df_A.groupby(df_A.kind)
-    df_S = group_1.get_group("Conference")
-    df_S = df_S.sample(frac = 0.2)
-  else:
-    df_S = df_A.iloc[:1]
-    df_S = df_S.fillna(0)
-  if 'Networking' in kind:
-    group_2 = df_A.groupby(df_A.kind)
-    df_V = group_2.get_group("Networking")
-    df_V = df_V.sample(frac = 0.2)
-  else:
-    df_V = df_A.iloc[:1]
-    df_V = df_V.fillna(0)
-  if 'Career Fairs' in kind:
-    group_2 = df_A.groupby(df_A.kind)
-    df_C = group_2.get_group("Career Fairs")
-    df_C = df_C.sample(frac = 0.2)
-  else:
-    df_C = df_A.iloc[:1]
-    df_C = df_C.fillna(0)
-  if 'Insight Days' in kind:
-    group_2 = df_A.groupby(df_A.kind)
-    df_I = group_2.get_group("Insight Days")
-    df_I = df_I.sample(frac = 0.2)
-  else:
-    df_I = df_A.iloc[:1]
-    df_I = df_I.fillna(0)
-  if 'Workshop' in kind:
-    group_2 = df_A.groupby(df_A.kind)
-    df_c = group_2.get_group("Workshop")
-    df_c = df_c.sample(frac = 0.2)
-  else:
-    df_c = df_A.iloc[:1]
-    df_c = df_c.fillna(0)
-
-df_3 = pd.concat([df_S,df_V])
-df_3 = pd.concat([df_3,df_C])
-df_3 = pd.concat([df_3,df_I])
-df_3 = pd.concat([df_3,df_c])
-
-
-if 'Find a Co-founder & Start a Business' in goals:
-  if "Conference" in kind:
-    group_1 = df_A.groupby(df_A.kind)
-    df_S = group_1.get_group("Conference")
-    df_S = df_S.sample(frac = 0.3)
-  else:
-    df_S = df_A.iloc[:1]
-    df_S = df_S.fillna(0)
-  if 'Networking' in kind:
-    group_2 = df_A.groupby(df_A.kind)
-    df_V = group_2.get_group("Networking")
-    df_V = df_V.sample(frac = 0.4)
-  else:
-    df_V = df_A.iloc[:1]
-    df_V = df_V.fillna(0)
-  if 'Competitions' in kind:
-    group_2 = df_A.groupby(df_A.kind)
-    df_C = group_2.get_group("Competitions")
-    df_C = df_C.sample(frac = 0.2)
-  else:
-    df_C = df_A.iloc[:1]
-    df_C = df_C.fillna(0)
-  
-
-df_4 = pd.concat([df_S,df_V])
-df_4 = pd.concat([df_4,df_C])
-
-if 'Meet Like-minded Students & join Societies' in goals:
-  if "Conference" in kind:
-    group_1 = df_A.groupby(df_A.kind)
-    df_S = group_1.get_group("Conference")
-    df_S = df_S.sample(frac = 0.2)
-  else:
-    df_S = df_A.iloc[:1]
-    df_S = df_S.fillna(0)
-  if 'Networking' in kind:
-    group_2 = df_A.groupby(df_A.kind)
-    df_V = group_2.get_group("Networking")
-    df_V = df_V.sample(frac = 0.3)
-  else:
-    df_V = df_A.iloc[:1]
-    df_V = df_V.fillna(0)
-  if 'Competitions' in kind:
-    group_2 = df_A.groupby(df_A.kind)
-    df_C = group_2.get_group("Competitions")
-    df_C = df_C.sample(frac = 0.3)
-  else:
-    df_C = df_A.iloc[:1]
-    df_C = df_C.fillna(0)
-  if 'Workshop' in kind:
-    group_2 = df_A.groupby(df_A.kind)
-    df_c = group_2.get_group("Workshop")
-    df_c = df_c.sample(frac = 0.2)
-  else:
-    df_c = df_A.iloc[:1]
-    df_c = df_c.fillna(0)
-df_5 = pd.concat([df_S,df_V])
-df_5 = pd.concat([df_5,df_C])
-df_5 = pd.concat([df_5,df_c])
-
-
-if 'Win Awards & Competitions' in goals:
-  if "Conference" in kind:
-    group_1 = df_A.groupby(df_A.kind)
-    df_S = group_1.get_group("Conference")
-    df_S = df_S.sample(frac = 0.2)
-  else:
-    df_S = df_A.iloc[:1]
-    df_S = df_S.fillna(0)
-  if 'CompetitionsN' in kind:
-    group_2 = df_A.groupby(df_A.kind)
-    df_C = group_2.get_group("Competitions")
-    df_C = df_C.sample(frac = 0.6)
-  else:
-    df_C = df_A.iloc[:1]
-    df_C = df_C.fillna(0)
-  if 'Workshop' in kind:
-    group_2 = df_A.groupby(df_A.kind)
-    df_c = group_2.get_group("Workshop")
-    df_c = df_c.sample(frac = 0.2)
-  else:
-    df_c = df_A.iloc[:1]
-    df_c = df_c.fillna(0)
-
-df_6 = pd.concat([df_S,df_C])
-df_6 = pd.concat([df_6,df_c])
-
-if 'Secure a Graduate Job' in goals:
-  if "Graduate Job" in kind:
-    group_1 = df_A.groupby(df_A.kind)
-    df_S = group_1.get_group("Graduate Job")
-    df_S = df_S.sample(frac = 1.0)
-  else:
-    df_S = df_A.iloc[:1]
-    df_S = df_S.fillna(0)
-  if 'Networking' in kind:
-    group_2 = df_A.groupby(df_A.kind)
-    df_C = group_2.get_group("Networking")
-    df_C = df_C.sample(frac = 0.3)
-  else:
-    df_C = df_A.iloc[:1]
-    df_C = df_C.fillna(0)
-  if 'Career Fairs' in kind:
-    group_2 = df_A.groupby(df_A.kind)
-    df_c = group_2.get_group("Career Fairs")
-    df_c = df_c.sample(frac = 0.7)
-  else:
-    df_c = df_A.iloc[:1]
-    df_c = df_c.fillna(0)
-
-df_7 = pd.concat([df_S,df_C])
-df_7 = pd.concat([df_7,df_c])
-
-if 'Land a Placement Year' in goals:
-  if "Placement Programme" in kind:
-    group_1 = df_A.groupby(df_A.kind)
-    df_S = group_1.get_group("Placement Programme")
-    df_S = df_S.sample(frac = 1.0)
-  else:
-    df_S = df_A.iloc[:1]
-    df_S = df_S.fillna(0)
-  if 'Networking' in kind:
-    group_2 = df_A.groupby(df_A.kind)
-    df_C = group_2.get_group("Networking")
-    df_C = df_C.sample(frac = 0.2)
-  else:
-    df_C = df_A.iloc[:1]
-    df_C = df_C.fillna(0)
-  if 'Career Fairs' in kind:
-    group_2 = df_A.groupby(df_A.kind)
-    df_c = group_2.get_group("Career Fairs")
-    df_c = df_c.sample(frac = 0.3)
-  else:
-    df_c = df_A.iloc[:1]
-    df_c = df_c.fillna(0)
-  
-  if 'Insight Days' in kind:
-    group_4 = df_A.groupby(df_A.kind)
-    df_I = group_4.get_group("Insight Days")
-    df_I = df_I.sample(frac = 0.3)
-  else:
-    df_I = df_A.iloc[:1]
-    df_I = df_I.fillna(0)
-  if 'Workshop' in kind:
-    group_5 = df_A.groupby(df_A.kind)
-    df_V = group_5.get_group("Workshop")
-    df_V = df_V.sample(frac = 0.2)
-  else:
-    df_c = df_A.iloc[:1]
-    df_c = df_c.fillna(0)
-df_8 = pd.concat([df_S,df_C])
-df_8 = pd.concat([df_8,df_c])
-df_8 = pd.concat([df_8,df_I])
-df_8 = pd.concat([df_8,df_V])
-
-if 'Get an Internship alongside my studies' in goals:
-  if "Virtual Internship" in kind:
-    group_1 = df_A.groupby(df_A.kind)
-    df_S = group_1.get_group("Virtual Internship")
-    df_S = df_S.sample(frac = 0.3)
-  else:
-    df_S = df_A.iloc[:1]
-    df_S = df_S.fillna(0)
-  if 'Off-cycle' in kind:
-    group_2 = df_A.groupby(df_A.kind)
-    df_C = group_2.get_group("Off-cycle")
-    df_C = df_C.sample(frac = 0.7)
-  else:
-    df_C = df_A.iloc[:1]
-    df_C = df_C.fillna(0)
-  if 'Career Fairs' in kind:
-    group_2 = df_A.groupby(df_A.kind)
-    df_c = group_2.get_group("Career Fairs")
-    df_c = df_c.sample(frac = 0.2)
-  else:
-    df_c = df_A.iloc[:1]
-    df_c = df_c.fillna(0)
-  
-  if 'Networking' in kind:
-    group_4 = df_A.groupby(df_A.kind)
-    df_I = group_4.get_group("Networking")
-    df_I = df_I.sample(frac = 0.5)
-  else:
-    df_I = df_A.iloc[:1]
-    df_I = df_I.fillna(0)
-  if 'Conference' in kind:
-    group_5 = df_A.groupby(df_A.kind)
-    df_V = group_5.get_group("Conference")
-    df_V = df_V.sample(frac = 0.3)
-  else:
-    df_c = df_A.iloc[:1]
-    df_c = df_c.fillna(0)
-df_9 = pd.concat([df_S,df_C])
-df_9 = pd.concat([df_9,df_c])
-df_9 = pd.concat([df_9,df_I])
-df_9 = pd.concat([df_9,df_V])
-
-
-
-
-
-
-
-matches = pd.concat([df_1,df_2])
-matches = pd.concat([matches,df_3])
-matches = pd.concat([matches,df_4])
-matches = pd.concat([matches,df_5])
-matches = pd.concat([matches,df_6])
-matches = pd.concat([matches,df_7])
-matches = pd.concat([matches,df_8])
-matches = pd.concat([matches,df_9])
-matches = matches.sort_values(by='matching score',ascending=False)
-group_10  = matches.groupby(matches.touchpointable_type)
-Internship = group_10.get_group("Internship")
-Internship =  pd.merge(df, Internship, left_on='id',right_on='id',suffixes=('', '_x'),how = 'inner')
-Internship = Internship.loc[:,~Internship.columns.duplicated()]
-Internship = Internship.iloc[:20]
-group_11 = matches.groupby(matches.touchpointable_type)
-Events = group_11.get_group("Event")
-Events =  pd.merge(df, Events, left_on='id',right_on='id',suffixes=('', '_x'),how = 'inner')
-Events = Events.loc[:,~Events.columns.duplicated()]
-Events = Events.iloc[:20]
-group_12 = matches.groupby(matches.touchpointable_type)
-Jobs = group_12.get_group("Job")
-Jobs =  pd.merge(df, Jobs, left_on='id',right_on='id',suffixes=('', '_x'),how = 'inner')
-Jobs = Jobs.loc[:,~Jobs.columns.duplicated()]
-Jobs = Jobs.iloc[:20]
 if st.button('Submit',key = 'eight'):
   
-    st.write(Internship)
-    st.write(Events)
-    st.write(Jobs)
+  st.write(df)
