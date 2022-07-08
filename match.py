@@ -3,7 +3,7 @@ import pandas as pd
 import psycopg2 as pg
 import collections, functools, operator
 import numpy as np
-@st.cache
+st.cache
 engine = pg.connect("dbname='huzzle_production' user='postgres' host='huzzle-production-db-read.ct4mk1ahmp9p.eu-central-1.rds.amazonaws.com' port='5432' password='S11mXHLGbA0Cb8z8uLfj'")
 df_touchpoints = pd.read_sql('select * from touchpoints', con=engine)
 df_tags = pd.read_sql('select * from tags', con=engine)
@@ -156,6 +156,11 @@ for group,df in df_A:
       n = n+1
       
   df = df.head(n)
+  df = pd.merge(df, df_1, left_on='id',right_on='id',suffixes=('', '_x'),how = 'inner')
+  df = df.loc[:,~df.columns.duplicated()]
+  df = df[['id','touchpointable_id','type','touchpointable_type','kind','title','name','creatable_for_name','Weight','city_name','city score','degree score','subject score','year score','value','matching score']].copy()
+  df = df.sort_values(by='matching score',ascending=False)
+  
 
 if st.button('Submit',key = 'eight'):
   
