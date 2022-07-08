@@ -148,14 +148,14 @@ df_A = pd.concat([df_A,df_O])
 df_A = df_A.groupby('id', as_index=False).first()
 df_A = df_A.sort_values(by='matching score',ascending=False)
 df_A = df_A.groupby(["kind","value"])
-for group,df in df_A:
-  df = pd.DataFrame(df)
-  n = df['value'].iloc[0]
-  n = round(len(df)*(n/10))
+for group,df_1 in df_A:
+  df_1 = pd.DataFrame(df_1)
+  n = df_1['value'].iloc[0]
+  n = round(len(df_1)*(n/10))
   if n == 0:
       n = n+1
       
-  df = df.head(n)
+  df_1 = df_1.head(n)
   df = pd.merge(df, df_1, left_on='id',right_on='id',suffixes=('', '_x'),how = 'inner')
   df = df.loc[:,~df.columns.duplicated()]
   df = df[['id','touchpointable_id','type','touchpointable_type','kind','title','name','creatable_for_name','Weight','city_name','city score','degree score','subject score','year score','value','matching score']].copy()
