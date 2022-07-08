@@ -38,7 +38,7 @@ df_T = group_6.get_group("Topic")
 df_goals = pd.merge(df_goals, df_goal_weights, left_on='id',right_on='goal_id',suffixes=('', '_x'),how = 'inner')
 df_goals = df_goals.loc[:,~df_goals.columns.duplicated()]
 df_goals = df_goals[['id','title','touchpointable_kind','value']].copy()
-df_goals['value'] = df_goals['value'].div(10)
+
 
 
 
@@ -60,7 +60,7 @@ Subject = st.selectbox('Enter the subject',df_subjects['name'].unique(),key = 'f
 Degree =  st.selectbox('Enter the degree',df_degrees['name'].unique(),key = 'six')
 year = ['First Year ','Second Year','Third Year','Final Year']
 Year = st.selectbox('Enter the year',year,key = 'seven')
-st.cache(suppress_st_warning=True)
+
 goals_1 =  pd.DataFrame(goals,columns =['Goals'])
 df_goals = pd.merge(df_goals, goals_1, left_on='title',right_on='Goals',suffixes=('', '_x'),how = 'inner')
 df_goals = df_goals.loc[:,~df_goals.columns.duplicated()]
